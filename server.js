@@ -7,8 +7,10 @@ app.use(express.json())
 require('dotenv').config()
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true })); 
-
-
+app.use(express.static(__dirname));
+app.get('/', ( req , res ) =>{
+        res.sendFile(path.join(__dirname, '/index.html'));
+} );
 app.post('/email-send', ( req , res ) => {
     const {emailTo, message}=req.body;
     var transporter = nodemailer.createTransport({
@@ -23,17 +25,17 @@ app.post('/email-send', ( req , res ) => {
         from: process.env.EMAIL,
         to: emailTo,
         subject: 'Sending Email using Node.js',
-        text: message
+        html:`<h1 align="center">${message}</h1>`
       };
       
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
           console.log(error);
-            res.json({success:false})
+            res.send("<br><h1 align='center'>Message send failed</h1>")
 
         } else {
             console.log('Email sent: ' + info.response);
-            res.json({success:true})
+            res.send("<br><h1 align='center'>Message send Successfull</h1>")
 
         }
     });
